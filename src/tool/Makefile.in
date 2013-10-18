@@ -7,6 +7,7 @@ COMMON_OBJ = $(addprefix $(COMMON_D)/obj_all/, des.o grfio.o malloc.o \
              miniconsole.o minicore.o showmsg.o strlib.o utils.o)
 COMMON_H = $(addprefix $(COMMON_D)/, cbasetypes.h console.h core.h des.h \
            grfio.h malloc.h mmo.h showmsg.h strlib.h utils.h)
+SYSINFO_INC = $(COMMON_D)/sysinfo.inc
 
 LIBCONFIG_D = ../../3rdparty/libconfig
 LIBCONFIG_OBJ = $(addprefix $(LIBCONFIG_D)/, libconfig.o grammar.o scanctx.o \

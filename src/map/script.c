@@ -12,6 +12,7 @@
 #include "../common/strlib.h"
 #include "../common/timer.h"
 #include "../common/utils.h"
+#include "../common/sysinfo.h"
 
 #include "map.h"
 #include "path.h"
@@ -3967,6 +3968,8 @@ int script_reload(void) {
 	mapreg->reload();
 	
 	itemdb->force_name_constants();
+
+	sysinfo_cvsrevision_reload();
 	
 	return 0;
 }
@@ -16893,19 +16896,6 @@ BUILDIN(is_function) {
 	return true;
 }
 /**
- * get_revision() -> retrieves the current svn revision (if available)
- **/
-BUILDIN(get_revision) {
-	const char *svn = get_svn_revision();
-	
-	if ( svn[0] != HERC_UNKNOWN_VER )
-		script_pushint(st,atoi(svn));
-	else
-		script_pushint(st,-1);//unknown
-	
-	return true;
-}
-/**
  * freeloop(<toggle>) -> toggles this script instance's looping-check ability
  **/
 BUILDIN(freeloop) {
@@ -18404,7 +18394,6 @@ void script_parse_builtin(void) {
 		BUILDIN_DEF(getargcount,""),
 		BUILDIN_DEF(getcharip,"?"),
 		BUILDIN_DEF(is_function,"s"),
-		BUILDIN_DEF(get_revision,""),
 		BUILDIN_DEF(freeloop,"i"),
 		BUILDIN_DEF(getrandgroupitem,"ii"),
 		BUILDIN_DEF(cleanmap,"s"),

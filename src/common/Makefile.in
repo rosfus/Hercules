@@ -16,7 +16,7 @@ MT19937AR_INCLUDE = -I$(MT19937AR_D)
 
 COMMON_SHARED_C = conf.c db.c des.c ers.c grfio.c HPM.c mapindex.c md5calc.c \
                   mempool.c mutex.c nullpo.c raconf.c random.c showmsg.c strlib.c \
-                  thread.c timer.c utils.c
+                  sysinfo.c thread.c timer.c utils.c
 COMMON_C = $(COMMON_SHARED_C)
 COMMON_SHARED_OBJ = $(patsubst %.c,%.o,$(COMMON_SHARED_C))
 COMMON_OBJ = $(addprefix obj_all/, $(COMMON_SHARED_OBJ) \
@@ -27,12 +27,13 @@ COMMON_C += console.c core.c malloc.c socket.c
 COMMON_H = atomic.h cbasetypes.h conf.h console.h core.h db.h des.h ers.h \
            evdp.h grfio.h HPM.h HPMi.h malloc.h mapindex.h md5calc.h \
            mempool.h mmo.h mutex.h netbuffer.h network.h nullpo.h raconf.h \
-           random.h showmsg.h socket.h spinlock.h sql.h strlib.h \
+           random.h showmsg.h socket.h spinlock.h sql.h strlib.h sysinfo.h \
            thread.h timer.h utils.h winapi.h
 
 COMMON_SQL_OBJ = obj_sql/sql.o
 COMMON_SQL_H = sql.h
 COMMON_C += sql.c
+SYSINFO_INC = sysinfo.inc
 
 HAVE_MYSQL=@HAVE_MYSQL@
 ifeq ($(HAVE_MYSQL),yes)
@@ -72,6 +73,10 @@ help:
 Makefile: Makefile.in
 	@$(MAKE) -C ../.. src/common/Makefile
 
+$(SYSINFO_INC): $(COMMON_C) $(COMMON_H) $(CONFIG_H) $(MT19937AR_H) $(LIBCONFIG_H)
+	@echo "	MAKE	$@"
+	@$(MAKE) -C ../.. sysinfo
+
 needs_mysql:
 	@echo "MySQL not found or disabled by the configure script"
 	@exit 1
@@ -104,15 +109,15 @@ common_mini: $(COMMON_MINI_OBJ) $(MT19937AR_OBJ) $(LIBCONFIG_OBJ) obj_all/common
 
 common_sql: $(COMMON_SQL_OBJ) obj_sql/common_sql.a Makefile
 
-obj_all/%.o: %.c $(COMMON_H) $(CONFIG_H) $(MT19937AR_H) $(LIBCONFIG_H) | obj_all
+obj_all/%.o: %.c $(COMMON_H) $(CONFIG_H) $(MT19937AR_H) $(LIBCONFIG_H) | $(SYSINFO_INC) obj_all
 	@echo "	CC	$<"
 	@$(CC) @CFLAGS@ $(MT19937AR_INCLUDE) $(LIBCONFIG_INCLUDE) @CPPFLAGS@ -c $(OUTPUT_OPTION) $<
 
-obj_all/mini%.o: %.c $(COMMON_H) $(CONFIG_H) $(MT19937AR_H) $(LIBCONFIG_H) | obj_all
+obj_all/mini%.o: %.c $(COMMON_H) $(CONFIG_H) $(MT19937AR_H) $(LIBCONFIG_H) | $(SYSINFO_INC) obj_all
 	@echo "	CC	$<"
 	@$(CC) @CFLAGS@ $(MT19937AR_INCLUDE) $(LIBCONFIG_INCLUDE) -DMINICORE @CPPFLAGS@ -c $(OUTPUT_OPTION) $<
 
-obj_sql/%.o: %.c $(COMMON_H) $(COMMON_SQL_H) $(CONFIG_H) $(LIBCONFIG_H) | obj_sql
+obj_sql/%.o: %.c $(COMMON_H) $(COMMON_SQL_H) $(CONFIG_H) $(LIBCONFIG_H) | $(SYSINFO_INC) obj_sql
 	@echo "	CC	$<"
 	@$(CC) @CFLAGS@ $(LIBCONFIG_INCLUDE) @MYSQL_CFLAGS@ @CPPFLAGS@ -c $(OUTPUT_OPTION) $<
 

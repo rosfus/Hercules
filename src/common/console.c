@@ -5,6 +5,7 @@
 #include "../common/cbasetypes.h"
 #include "../common/showmsg.h"
 #include "../common/core.h"
+#include "../common/sysinfo.h"
 #include "../config/core.h"
 #include "console.h"
 
@@ -41,8 +42,17 @@ struct console_interface console_s;
  *	CORE : Display title
  *--------------------------------------*/
 void display_title(void) {
-	const char* svn = get_svn_revision();
-	const char* git = get_git_hash();
+	char platform[256], osversion[256], cpu[256], arch[256], cvstype[32], cvsrevision_src[64], cvsrevision_scripts[64];
+	char compiler[256], cflags[256];
+	sysinfo_platform(platform, 256);
+	sysinfo_osversion(osversion, 256);
+	sysinfo_cpu(cpu, 256);
+	sysinfo_arch(arch, 256);
+	sysinfo_cvstype(cvstype, 32);
+	sysinfo_cvsrevision_src(cvsrevision_src, 64);
+	sysinfo_cvsrevision_scripts(cvsrevision_scripts, 64);
+	sysinfo_compiler(compiler, 256);
+	sysinfo_cflags(cflags, 256);
 
 	ShowMessage("\n");
 	ShowMessage(""CL_BG_RED""CL_BT_WHITE"                                                                      "CL_CLL""CL_NORMAL"\n");
@@ -57,10 +67,12 @@ void display_title(void) {
 	ShowMessage(""CL_BG_RED""CL_BT_WHITE"                    http://hercules.ws/board/                         "CL_CLL""CL_NORMAL"\n");
 	ShowMessage(""CL_BG_RED""CL_BT_WHITE"                                                                      "CL_CLL""CL_NORMAL"\n");
 
-	if( git[0] != HERC_UNKNOWN_VER )
-		ShowInfo("Git Hash: '"CL_WHITE"%s"CL_RESET"'\n", git);
-	else if( svn[0] != HERC_UNKNOWN_VER )
-		ShowInfo("SVN Revision: '"CL_WHITE"%s"CL_RESET"'\n", svn);
+	ShowInfo("Hercules %d-bit for %s\n", sysinfo_is64bit() ? 64 : 32, platform);
+	ShowInfo("%s revision: '"CL_WHITE"%s"CL_RESET"' (src), '"CL_WHITE"%s"CL_RESET"' (scripts)\n", cvstype, cvsrevision_src, cvsrevision_scripts);
+	ShowInfo("OS version: '"CL_WHITE"%s"CL_RESET" [%s]'\n", osversion, arch);
+	ShowInfo("CPU: '"CL_WHITE"%s"CL_RESET"'\n", cpu);
+	ShowInfo("Compiled with %s\n", compiler);
+	ShowInfo("Compile Flags: %s\n", cflags);
 }
 #ifdef CONSOLE_INPUT
 #if defined(WIN32)

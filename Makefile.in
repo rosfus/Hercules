@@ -51,6 +51,7 @@ export CC
 	clean \
 	buildclean \
 	distclean \
+	sysinfo \
 	hooks \
 	help
 
@@ -139,6 +140,10 @@ clean buildclean: $(MF_TARGETS)
 
 distclean: clean
 	@-rm -f $(MF_TARGETS) config.status config.log
+
+sysinfo:
+	@echo "	SYSINFO"
+	@./sysinfogen.sh src/common/sysinfo.inc @CFLAGS@
 
 help: Makefile
 	@echo "most common targets are 'all' 'sql' 'clean' 'plugins' 'help'"
